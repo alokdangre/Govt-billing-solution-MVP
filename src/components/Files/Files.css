@@ -28,3 +28,18 @@ th:last-child {
   padding-right: 0;
 }
 606c76*/
+
+/* Ensure modal content is aligned to the top and file list is below search bar */
+.file-modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+  justify-content: flex-start;
+}
+
+.file-list {
+  margin-top: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+}

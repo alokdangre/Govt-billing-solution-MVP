@@ -65,4 +65,17 @@ export class Local {
       return false;
     }
   };
+
+  // Returns all files, or filters by searchTerm if provided
+  getAllFiles = async (searchTerm?: string) => {
+    let arr = {};
+    const { keys } = await Preferences.keys();
+    for (let i = 0; i < keys.length; i++) {
+      let fname = keys[i];
+      if (searchTerm && !fname.toLowerCase().includes(searchTerm.toLowerCase())) continue;
+      const data = await this._getFile(fname);
+      arr[fname] = (data as any).modified;
+    }
+    return arr;
+  };
 }

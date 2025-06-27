@@ -12,6 +12,7 @@ import {
   IonLabel,
   IonAlert,
   IonItemGroup,
+  IonSearchbar,
 } from "@ionic/react";
 import { fileTrayFull, trash, create } from "ionicons/icons";
 
@@ -21,10 +22,11 @@ const Files: React.FC<{
   updateSelectedFile: Function;
   updateBillType: Function;
 }> = (props) => {
-  const [modal, setModal] = useState(null);
   const [listFiles, setListFiles] = useState(false);
   const [showAlert1, setShowAlert1] = useState(false);
   const [currentKey, setCurrentKey] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [files, setFiles] = useState({});
 
   const editFile = (key) => {
     props.store._getFile(key).then((data) => {
@@ -49,60 +51,20 @@ const Files: React.FC<{
     return new Date(date).toLocaleString();
   };
 
+  const getResults = async (ev: any) => {
+    const value = ev.target.value;
+    setSearchTerm(value);
+    const files = await props.store.getAllFiles(value);
+    setFiles(files);
+  };
+
   const temp = async () => {
-    const files = await props.store._getAllFiles();
-    const fileList = Object.keys(files).map((key) => {
-      return (
-        <IonItemGroup key={key}>
-          <IonItem>
-            <IonLabel>{key}</IonLabel>
-            {_formatDate(files[key])}
-
-            <IonIcon
-              icon={create}
-              color="warning"
-              slot="end"
-              size="large"
-              onClick={() => {
-                setListFiles(false);
-                editFile(key);
-              }}
-            />
-
-            <IonIcon
-              icon={trash}
-              color="danger"
-              slot="end"
-              size="large"
-              onClick={() => {
-                setListFiles(false);
-                deleteFile(key);
-              }}
-            />
-          </IonItem>
-        </IonItemGroup>
-      );
-    });
-
-    const ourModal = (
-      <IonModal isOpen={listFiles} onDidDismiss={() => setListFiles(false)}>
-        <IonList>{fileList}</IonList>
-        <IonButton
-          expand="block"
-          color="secondary"
-          onClick={() => {
-            setListFiles(false);
-          }}
-        >
-          Back
-        </IonButton>
-      </IonModal>
-    );
-    setModal(ourModal);
+    const files = await props.store.getAllFiles(searchTerm);
+    setFiles(files);
   };
 
   useEffect(() => {
-    temp();
+    if (listFiles) temp();
   }, [listFiles]);
 
   return (
@@ -116,7 +78,54 @@ const Files: React.FC<{
           setListFiles(true);
         }}
       />
-      {modal}
+      <IonModal isOpen={listFiles} onDidDismiss={() => setListFiles(false)}>
+        <div className="file-modal-content">
+          <IonSearchbar
+            value={searchTerm}
+            onIonInput={getResults}
+            placeholder="Search files by name"
+          />
+          <IonList className="file-list">
+            {Object.keys(files).map((key) => (
+              <IonItemGroup key={key}>
+                <IonItem>
+                  <IonLabel>{key}</IonLabel>
+                  {_formatDate(files[key])}
+                  <IonIcon
+                    icon={create}
+                    color="warning"
+                    slot="end"
+                    size="large"
+                    onClick={() => {
+                      setListFiles(false);
+                      editFile(key);
+                    }}
+                  />
+                  <IonIcon
+                    icon={trash}
+                    color="danger"
+                    slot="end"
+                    size="large"
+                    onClick={() => {
+                      setListFiles(false);
+                      deleteFile(key);
+                    }}
+                  />
+                </IonItem>
+              </IonItemGroup>
+            ))}
+          </IonList>
+          <IonButton
+            expand="block"
+            color="secondary"
+            onClick={() => {
+              setListFiles(false);
+            }}
+          >
+            Back
+          </IonButton>
+        </div>
+      </IonModal>
       <IonAlert
         animated
         isOpen={showAlert1}
