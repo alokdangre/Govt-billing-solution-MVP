@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import * as AppGeneral from "../socialcalc/index.js";
 import { File, Local } from "../Storage/LocalStorage";
 import { isPlatform, IonToast } from "@ionic/react";
 import { EmailComposer } from "capacitor-email-composer";
 import { Printer } from "@ionic-native/printer";
 import { IonActionSheet, IonAlert } from "@ionic/react";
-import { saveOutline, save, mail, print } from "ionicons/icons";
+import { saveOutline, save, mail, print, cloudUpload, documentText, download } from "ionicons/icons";
 import { APP_NAME } from "../../app-data.js";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
+import jsPDF from "jspdf";
 
 const Menu: React.FC<{
   showM: boolean;
@@ -22,6 +24,10 @@ const Menu: React.FC<{
   const [showAlert4, setShowAlert4] = useState(false);
   const [showToast1, setShowToast1] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const fileInputRef = useRef(null);
+  const [showUploadToast, setShowUploadToast] = useState(false);
+  const [uploadToastMsg, setUploadToastMsg] = useState("");
+
   /* Utility functions */
   const _validateName = async (filename) => {
     filename = filename.trim();
@@ -132,6 +138,62 @@ const Menu: React.FC<{
     }
   };
 
+  const handleUploadCurrentFile = async () => {
+    try {
+      // Get the current file's content and name
+      const data = await props.store._getFile(props.file);
+      const fileContent = data.content;
+      const fileName = props.file.endsWith('.json') ? props.file : props.file + '.json';
+      const storage = getStorage();
+      const storageRef = ref(storage, `uploads/${fileName}`);
+      // Upload as a Blob
+      const blob = new Blob([decodeURIComponent(fileContent)], { type: 'application/json' });
+      await uploadBytes(storageRef, blob);
+      setUploadToastMsg("Current file uploaded to server!");
+      setShowUploadToast(true);
+    } catch (err) {
+      setUploadToastMsg("Upload failed: " + (err.message || err));
+      setShowUploadToast(true);
+    }
+  };
+
+  const handleExportAsPDF = async () => {
+    try {
+      // Get the current file's HTML content
+      const htmlContent = AppGeneral.getCurrentHTMLContent();
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      // Add HTML to PDF
+      await doc.html(htmlContent, { x: 20, y: 20 });
+      doc.save((props.file || 'export') + '.pdf');
+      setUploadToastMsg("PDF exported!");
+      setShowUploadToast(true);
+    } catch (err) {
+      setUploadToastMsg("PDF export failed: " + (err.message || err));
+      setShowUploadToast(true);
+    }
+  };
+
+  const handleExportAsCSV = async () => {
+    try {
+      // Get the current file's CSV content
+      const csvContent = AppGeneral.getCSVContent();
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (props.file || 'export') + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setUploadToastMsg("CSV exported!");
+      setShowUploadToast(true);
+    } catch (err) {
+      setUploadToastMsg("CSV export failed: " + (err.message || err));
+      setShowUploadToast(true);
+    }
+  };
+
   return (
     <React.Fragment>
       <IonActionSheet
@@ -139,38 +201,56 @@ const Menu: React.FC<{
         keyboardClose
         isOpen={props.showM}
         onDidDismiss={() => props.setM()}
+        header="File Actions"
         buttons={[
           {
             text: "Save",
             icon: saveOutline,
-            handler: () => {
-              doSave();
-              console.log("Save clicked");
-            },
+            handler: () => { doSave(); },
+            cssClass: 'action-sheet-save',
           },
           {
             text: "Save As",
             icon: save,
-            handler: () => {
-              setShowAlert3(true);
-              console.log("Save As clicked");
-            },
+            handler: () => { setShowAlert3(true); },
+            cssClass: 'action-sheet-saveas',
           },
           {
             text: "Print",
             icon: print,
-            handler: () => {
-              doPrint();
-              console.log("Print clicked");
-            },
+            handler: () => { doPrint(); },
+            cssClass: 'action-sheet-print',
           },
           {
             text: "Email",
             icon: mail,
-            handler: () => {
-              sendEmail();
-              console.log("Email clicked");
-            },
+            handler: () => { sendEmail(); },
+            cssClass: 'action-sheet-email',
+          },
+          {
+            text: "Upload File to Server",
+            icon: cloudUpload,
+            handler: handleUploadCurrentFile,
+            cssClass: 'action-sheet-upload',
+          },
+          // Divider
+          // {
+          //   text: "---",
+          //   role: 'destructive',
+          //   cssClass: 'action-sheet-divider',
+          //   handler: () => {},
+          // },
+          {
+            text: "Export as PDF",
+            icon: documentText,
+            handler: handleExportAsPDF,
+            cssClass: 'action-sheet-pdf',
+          },
+          {
+            text: "Export as CSV",
+            icon: download,
+            handler: handleExportAsCSV,
+            cssClass: 'action-sheet-csv',
           },
         ]}
       />
@@ -236,6 +316,30 @@ const Menu: React.FC<{
         message={toastMessage}
         duration={500}
       />
+      <IonToast
+        isOpen={showUploadToast}
+        onDidDismiss={() => setShowUploadToast(false)}
+        message={uploadToastMsg}
+        duration={2000}
+      />
+      <style>{`
+      .action-sheet-save, .action-sheet-saveas, .action-sheet-print, .action-sheet-email, .action-sheet-upload, .action-sheet-pdf, .action-sheet-csv {
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+      .action-sheet-divider {
+        pointer-events: none;
+        background: #f4f4f4;
+        height: 2px;
+        margin: 8px 0;
+      }
+      @media (max-width: 600px) {
+        .action-sheet-save, .action-sheet-saveas, .action-sheet-print, .action-sheet-email, .action-sheet-upload, .action-sheet-pdf, .action-sheet-csv {
+          font-size: 1.2rem;
+          padding: 18px 0;
+        }
+      }
+      `}</style>
     </React.Fragment>
   );
 };
