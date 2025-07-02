@@ -2,3 +2,12 @@
   height: min-content;
   overflow: hidden;
 }
+
+.navbar-auth-btn, .navbar-auth-btn:focus, .navbar-auth-btn:active {
+  color: #fff !important;
+  background-color: hsl(250, 83%, 53%) !important;
+}
+
+.navbar-auth-icon {
+  color: #fff !important;
+}
