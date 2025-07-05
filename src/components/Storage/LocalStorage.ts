@@ -6,19 +6,22 @@ export class File {
   name: string;
   content: string;
   billType: number;
+  passwordProtected?: boolean;
 
   constructor(
     created: string,
     modified: string,
     content: string,
     name: string,
-    billType: number
+    billType: number,
+    passwordProtected?: boolean
   ) {
     this.created = created;
     this.modified = modified;
     this.content = content;
     this.name = name;
     this.billType = billType;
+    this.passwordProtected = passwordProtected;
   }
 }
 
@@ -30,6 +33,7 @@ export class Local {
       content: file.content,
       name: file.name,
       billType: file.billType,
+      passwordProtected: file.passwordProtected || false,
     };
     await Preferences.set({
       key: file.name,

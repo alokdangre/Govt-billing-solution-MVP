@@ -7,8 +7,9 @@ import { Printer } from "@ionic-native/printer";
 import { IonActionSheet, IonAlert } from "@ionic/react";
 import { saveOutline, save, mail, print, cloudUpload, documentText, download } from "ionicons/icons";
 import { APP_NAME } from "../../app-data.js";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
 import jsPDF from "jspdf";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import CryptoJS from "crypto-js";
 
 const Menu: React.FC<{
   showM: boolean;
@@ -17,6 +18,7 @@ const Menu: React.FC<{
   updateSelectedFile: Function;
   store: Local;
   bT: number;
+  setFile?: Function;
 }> = (props) => {
   const [showAlert1, setShowAlert1] = useState(false);
   const [showAlert2, setShowAlert2] = useState(false);
@@ -27,6 +29,14 @@ const Menu: React.FC<{
   const fileInputRef = useRef(null);
   const [showUploadToast, setShowUploadToast] = useState(false);
   const [uploadToastMsg, setUploadToastMsg] = useState("");
+  const [showFileNamePrompt, setShowFileNamePrompt] = useState(false);
+  const [pendingUploadContent, setPendingUploadContent] = useState(null);
+  const [pendingUploadName, setPendingUploadName] = useState("");
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+  const [pendingPassword, setPendingPassword] = useState("");
+  const [pendingFileName, setPendingFileName] = useState("");
+  const [showFileNamePromptForPassword, setShowFileNamePromptForPassword] = useState(false);
+  const [pendingPasswordAction, setPendingPasswordAction] = useState(null);
 
   /* Utility functions */
   const _validateName = async (filename) => {
@@ -138,23 +148,91 @@ const Menu: React.FC<{
     }
   };
 
+  const saveFileAs = async (fileName) => {
+    const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
+    const file = new File(
+      new Date().toString(),
+      new Date().toString(),
+      content,
+      fileName,
+      props.bT
+    );
+    await props.store._saveFile(file);
+    props.updateSelectedFile(fileName);
+    return file;
+  };
+
   const handleUploadCurrentFile = async () => {
     try {
+      // Check if user is logged in
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.uid) {
+        setUploadToastMsg("You must be logged in to upload to server.");
+        setShowUploadToast(true);
+        return;
+      }
       // Get the current file's content and name
-      const data = await props.store._getFile(props.file);
-      const fileContent = data.content;
-      const fileName = props.file.endsWith('.json') ? props.file : props.file + '.json';
-      const storage = getStorage();
-      const storageRef = ref(storage, `uploads/${fileName}`);
-      // Upload as a Blob
-      const blob = new Blob([decodeURIComponent(fileContent)], { type: 'application/json' });
-      await uploadBytes(storageRef, blob);
-      setUploadToastMsg("Current file uploaded to server!");
+      let fileName = props.file;
+      let data = await props.store._getFile(props.file);
+      let fileContent = data ? data.content : null;
+      if (!fileName || !fileContent) {
+        // Prompt for file name, then save as, then upload
+        setShowFileNamePrompt(true);
+        setPendingUploadContent(AppGeneral.getSpreadsheetContent());
+        setPendingUploadName("");
+        setPendingPasswordAction(() => async (fileName) => {
+          await saveFileAs(fileName); // Save as logic
+          setPendingUploadName(fileName);
+          // Now upload
+          const db = getFirestore();
+          await setDoc(doc(db, `users/${user.uid}/files`, fileName.endsWith('.json') ? fileName : fileName + '.json'), {
+            name: fileName.endsWith('.json') ? fileName : fileName + '.json',
+            content: encodeURIComponent(AppGeneral.getSpreadsheetContent()),
+            uploadedAt: new Date().toISOString(),
+          });
+          setUploadToastMsg(`File '${fileName}' uploaded to Firestore!`);
+          setShowUploadToast(true);
+        });
+        return;
+      }
+      fileName = fileName.endsWith('.json') ? fileName : fileName + '.json';
+      const db = getFirestore();
+      await setDoc(doc(db, `users/${user.uid}/files`, fileName), {
+        name: fileName,
+        content: fileContent,
+        uploadedAt: new Date().toISOString(),
+      });
+      setUploadToastMsg(`File '${fileName}' uploaded to Firestore!`);
       setShowUploadToast(true);
     } catch (err) {
       setUploadToastMsg("Upload failed: " + (err.message || err));
       setShowUploadToast(true);
     }
+  };
+
+  const handleFileNamePromptOk = async (alertData) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    let fileName = alertData.fileName;
+    if (!fileName) {
+      setUploadToastMsg("File name is required.");
+      setShowUploadToast(true);
+      return;
+    }
+    if (pendingPasswordAction) {
+      await pendingPasswordAction(fileName);
+      setShowFileNamePrompt(false);
+      return;
+    }
+    fileName = fileName.endsWith('.json') ? fileName : fileName + '.json';
+    const db = getFirestore();
+    await setDoc(doc(db, `users/${user.uid}/files`, fileName), {
+      name: fileName,
+      content: encodeURIComponent(pendingUploadContent),
+      uploadedAt: new Date().toISOString(),
+    });
+    setShowFileNamePrompt(false);
+    setUploadToastMsg(`File '${fileName}' uploaded to Firestore!`);
+    setShowUploadToast(true);
   };
 
   const handleExportAsPDF = async () => {
@@ -190,6 +268,64 @@ const Menu: React.FC<{
       setShowUploadToast(true);
     } catch (err) {
       setUploadToastMsg("CSV export failed: " + (err.message || err));
+      setShowUploadToast(true);
+    }
+  };
+
+  const handlePasswordProtect = async () => {
+    setPendingFileName(props.file);
+    // Try to get the file
+    const data = await props.store._getFile(props.file);
+    if (!data) {
+      // Prompt for file name, then save as, then ask password
+      setShowFileNamePromptForPassword(true);
+      setPendingPasswordAction(() => async (fileName) => {
+        await saveFileAs(fileName); // Save as logic
+        setPendingFileName(fileName);
+        setShowPasswordPrompt(true);
+      });
+      return;
+    }
+    setShowPasswordPrompt(true);
+  };
+
+  const handleFileNamePromptForPasswordOk = async (alertData) => {
+    const fileName = alertData.fileName;
+    if (!fileName) {
+      setUploadToastMsg("File name is required.");
+      setShowUploadToast(true);
+      return;
+    }
+    if (pendingPasswordAction) {
+      await pendingPasswordAction(fileName);
+      setShowFileNamePromptForPassword(false);
+    }
+  };
+
+  const handlePasswordPromptOk = async (alertData) => {
+    const password = alertData.password;
+    if (!password) {
+      setUploadToastMsg("Password is required.");
+      setShowUploadToast(true);
+      return;
+    }
+    try {
+      const data = await props.store._getFile(pendingFileName);
+      if (!data) {
+        setUploadToastMsg("File not found.");
+        setShowUploadToast(true);
+        return;
+      }
+      // Encrypt content
+      const encrypted = CryptoJS.AES.encrypt(decodeURIComponent(data.content), password).toString();
+      data.content = encrypted;
+      data.passwordProtected = true;
+      await props.store._saveFile(data);
+      setShowPasswordPrompt(false);
+      setUploadToastMsg("File password protected!");
+      setShowUploadToast(true);
+    } catch (err) {
+      setUploadToastMsg("Failed to protect file: " + (err.message || err));
       setShowUploadToast(true);
     }
   };
@@ -252,6 +388,11 @@ const Menu: React.FC<{
             handler: handleExportAsCSV,
             cssClass: 'action-sheet-csv',
           },
+          {
+            text: "Password Protect File",
+            handler: handlePasswordProtect,
+            cssClass: 'action-sheet-password',
+          },
         ]}
       />
       <IonAlert
@@ -304,6 +445,42 @@ const Menu: React.FC<{
           "</strong> saved successfully"
         }
         buttons={["Ok"]}
+      />
+      <IonAlert
+        isOpen={showFileNamePrompt}
+        onDidDismiss={() => setShowFileNamePrompt(false)}
+        header="Enter File Name"
+        inputs={[
+          { name: "fileName", type: "text", placeholder: "Enter file name" },
+        ]}
+        buttons={[
+          { text: "Cancel", role: "cancel", handler: () => setShowFileNamePrompt(false) },
+          { text: "OK", handler: handleFileNamePromptOk },
+        ]}
+      />
+      <IonAlert
+        isOpen={showPasswordPrompt}
+        onDidDismiss={() => setShowPasswordPrompt(false)}
+        header="Set Password"
+        inputs={[
+          { name: "password", type: "password", placeholder: "Enter password" },
+        ]}
+        buttons={[
+          { text: "Cancel", role: "cancel", handler: () => setShowPasswordPrompt(false) },
+          { text: "OK", handler: handlePasswordPromptOk },
+        ]}
+      />
+      <IonAlert
+        isOpen={showFileNamePromptForPassword}
+        onDidDismiss={() => setShowFileNamePromptForPassword(false)}
+        header="Enter File Name"
+        inputs={[
+          { name: "fileName", type: "text", placeholder: "Enter file name" },
+        ]}
+        buttons={[
+          { text: "Cancel", role: "cancel", handler: () => setShowFileNamePromptForPassword(false) },
+          { text: "OK", handler: handleFileNamePromptForPasswordOk },
+        ]}
       />
       <IonToast
         animated

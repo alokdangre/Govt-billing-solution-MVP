@@ -47,6 +47,7 @@ const Home: React.FC = () => {
       return null;
     }
   });
+  const [authName, setAuthName] = useState("");
 
   const store = new Local();
 
@@ -170,7 +171,7 @@ const Home: React.FC = () => {
           <div id="msg"></div>
         </div>
       </IonContent>
-      <IonModal isOpen={showAuth} onDidDismiss={() => setShowAuth(false)}>
+      <IonModal isOpen={showAuth} onDidDismiss={() => { setShowAuth(false); setAuthName(""); }}>
         <div style={{ padding: 32, maxWidth: 400, margin: '40px auto', background: '#23243a', borderRadius: 16, boxShadow: '0 2px 16px rgba(0,0,0,0.15)' }}>
           <h2 style={{ textAlign: 'center', marginBottom: 24, color: '#fff' }}>{authMode === 'login' ? 'Login' : 'Register'}</h2>
           <form
@@ -183,16 +184,18 @@ const Home: React.FC = () => {
                 if (authMode === 'login') {
                   userCred = await login(authEmail, authPassword);
                   setAuthSuccess('Login successful!');
+                  localStorage.setItem('user', JSON.stringify({ email: userCred.user.email, uid: userCred.user.uid }));
+                  setUser({ email: userCred.user.email, uid: userCred.user.uid });
                 } else {
                   userCred = await register(authEmail, authPassword);
                   setAuthSuccess('Registration successful!');
+                  localStorage.setItem('user', JSON.stringify({ email: userCred.user.email, uid: userCred.user.uid, name: authName }));
+                  setUser({ email: userCred.user.email, uid: userCred.user.uid, name: authName });
                 }
-                // Store user info in localStorage
-                localStorage.setItem('user', JSON.stringify({ email: userCred.user.email, uid: userCred.user.uid }));
-                setUser({ email: userCred.user.email, uid: userCred.user.uid });
                 setTimeout(() => {
                   setShowAuth(false);
                   setAuthSuccess("");
+                  setAuthName("");
                 }, 1200);
               } catch (err) {
                 setAuthError(err.message || 'Authentication failed');
@@ -200,6 +203,19 @@ const Home: React.FC = () => {
             }}
             style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
           >
+            {authMode === 'register' && (
+              <>
+                <label style={{ fontWeight: 500, color: '#fff' }}>Name</label>
+                <input
+                  type="text"
+                  value={authName}
+                  onChange={e => setAuthName(e.target.value)}
+                  required
+                  placeholder="Enter your name"
+                  style={{ padding: 10, borderRadius: 8, border: '1px solid #444', fontSize: 16, color: '#fff', background: '#23243a' }}
+                />
+              </>
+            )}
             <label style={{ fontWeight: 500, color: '#fff' }}>Email</label>
             <input
               ref={emailInputRef}
@@ -240,12 +256,13 @@ const Home: React.FC = () => {
                 setAuthMode(authMode === 'login' ? 'register' : 'login');
                 setAuthError("");
                 setAuthSuccess("");
+                setAuthName("");
               }}
               style={{ color: '#3880ff', fontWeight: 500 }}
             >
               {authMode === 'login' ? "Don't have an account? Register" : 'Already have an account? Login'}
             </IonButton>
-            <IonButton expand="block" fill="clear" color="medium" type="button" onClick={() => setShowAuth(false)}>
+            <IonButton expand="block" fill="clear" color="medium" type="button" onClick={() => { setShowAuth(false); setAuthName(""); }}>
               Cancel
             </IonButton>
           </form>
