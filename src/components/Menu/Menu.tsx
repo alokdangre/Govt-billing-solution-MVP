@@ -10,6 +10,7 @@ import { APP_NAME } from "../../app-data.js";
 import jsPDF from "jspdf";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import CryptoJS from "crypto-js";
+import { AutoSaveService } from "../AutoSave/AutoSaveService";
 
 const Menu: React.FC<{
   showM: boolean;
@@ -84,23 +85,35 @@ const Menu: React.FC<{
       printWindow.print();
     }
   };
-  const doSave = () => {
+  const doSave = async () => {
     if (props.file === "default") {
       setShowAlert1(true);
       return;
     }
-    const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
-    const data = props.store._getFile(props.file);
-    const file = new File(
-      (data as any).created,
-      new Date().toString(),
-      content,
-      props.file,
-      props.bT
-    );
-    props.store._saveFile(file);
-    props.updateSelectedFile(props.file);
-    setShowAlert2(true);
+    
+    try {
+      const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
+      const data = await props.store._getFile(props.file);
+      const file = new File(
+        (data as any).created,
+        new Date().toISOString(),
+        content,
+        props.file,
+        props.bT
+      );
+      await props.store._saveFile(file);
+      props.updateSelectedFile(props.file);
+      
+      // Update auto-save service with the new content
+      const autoSaveService = AutoSaveService.getInstance();
+      autoSaveService.updateCurrentFile(props.file, props.bT);
+      
+      setShowAlert2(true);
+    } catch (error) {
+      console.error('Save failed:', error);
+      setToastMessage("Failed to save file: " + error.message);
+      setShowToast1(true);
+    }
   };
 
   const doSaveAs = async (filename) => {
@@ -108,21 +121,32 @@ const Menu: React.FC<{
     if (filename) {
       // console.log(filename, _validateName(filename));
       if (await _validateName(filename)) {
-        // filename valid . go on save
-        const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
-        // console.log(content);
-        const file = new File(
-          new Date().toString(),
-          new Date().toString(),
-          content,
-          filename,
-          props.bT
-        );
-        // const data = { created: file.created, modified: file.modified, content: file.content, password: file.password };
-        // console.log(JSON.stringify(data));
-        props.store._saveFile(file);
-        props.updateSelectedFile(filename);
-        setShowAlert4(true);
+        try {
+          // filename valid . go on save
+          const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
+          // console.log(content);
+          const file = new File(
+            new Date().toISOString(),
+            new Date().toISOString(),
+            content,
+            filename,
+            props.bT
+          );
+          // const data = { created: file.created, modified: file.modified, content: file.content, password: file.password };
+          // console.log(JSON.stringify(data));
+          await props.store._saveFile(file);
+          props.updateSelectedFile(filename);
+          
+          // Update auto-save service with the new file
+          const autoSaveService = AutoSaveService.getInstance();
+          autoSaveService.updateCurrentFile(filename, props.bT);
+          
+          setShowAlert4(true);
+        } catch (error) {
+          console.error('Save As failed:', error);
+          setToastMessage("Failed to save file: " + error.message);
+          setShowToast1(true);
+        }
       } else {
         setShowToast1(true);
       }
