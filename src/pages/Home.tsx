@@ -15,6 +15,7 @@ import {
 import { APP_NAME, DATA } from "../app-data";
 import * as AppGeneral from "../components/socialcalc/index.js";
 import { useEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { Local } from "../components/Storage/LocalStorage";
 import { menu, settings, personCircle } from "ionicons/icons";
 import "./Home.css";
@@ -22,6 +23,8 @@ import Menu from "../components/Menu/Menu";
 import Files from "../components/Files/Files";
 import NewFile from "../components/NewFile/NewFile";
 import { login, register } from "../components/Firebase/auth";
+import AutoSaveIndicator from "../components/AutoSave/AutoSaveIndicator";
+import { AutoSaveService } from "../components/AutoSave/AutoSaveService";
 
 const Home: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -48,8 +51,10 @@ const Home: React.FC = () => {
     }
   });
   const [authName, setAuthName] = useState("");
+  const location = useLocation();
 
   const store = new Local();
+  const autoSaveService = AutoSaveService.getInstance();
 
   const closeMenu = () => {
     setShowMenu(false);
@@ -64,9 +69,36 @@ const Home: React.FC = () => {
     AppGeneral.initializeApp(JSON.stringify(data));
   }, []);
 
+  // Check for selected file from FileList when location changes or component mounts
+  useEffect(() => {
+    const storedFile = localStorage.getItem('selectedFile');
+    const storedBillType = localStorage.getItem('selectedBillType');
+    if (storedFile && storedFile !== selectedFile) {
+      updateSelectedFile(storedFile);
+      if (storedBillType) {
+        updateBillType(parseInt(storedBillType));
+      }
+      // Clear the stored values after using them
+      localStorage.removeItem('selectedFile');
+      localStorage.removeItem('selectedBillType');
+    }
+  }, [location.pathname, selectedFile]);
+
   useEffect(() => {
     activateFooter(billType);
   }, [billType]);
+
+  // Initialize auto-save when selectedFile or billType changes
+  useEffect(() => {
+    autoSaveService.updateCurrentFile(selectedFile, billType);
+  }, [selectedFile, billType]);
+
+  // Cleanup auto-save on component unmount
+  useEffect(() => {
+    return () => {
+      autoSaveService.stop();
+    };
+  }, []);
 
   const footers = DATA["home"][device]["footers"];
   const footersList = footers.map((footerArray) => {
@@ -148,6 +180,9 @@ const Home: React.FC = () => {
           <IonTitle className="ion-text-center">
             Editing : {selectedFile}
           </IonTitle>
+          <div slot="end" className="ion-padding-end">
+            <AutoSaveIndicator />
+          </div>
         </IonToolbar>
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
