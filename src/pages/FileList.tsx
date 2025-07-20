@@ -3,7 +3,7 @@ import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonLabel, IonIcon, IonList, IonItem, IonSpinner, IonToast, IonSegment, IonSegmentButton, IonAlert, IonButton, IonSearchbar, IonCheckbox, IonGrid, IonRow, IonCol
 } from "@ionic/react";
 import { document, cloud, create, trash, cloudUpload, download, search, checkboxOutline, square } from "ionicons/icons";
-import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { Local } from "../components/Storage/LocalStorage";
 import * as AppGeneral from '../components/socialcalc/index.js';
 import { useHistory } from "react-router-dom";
@@ -24,6 +24,8 @@ const FileList: React.FC = () => {
   const [selectedServerFiles, setSelectedServerFiles] = useState<Set<string>>(new Set());
   const [showSelectedUploadAlert, setShowSelectedUploadAlert] = useState(false);
   const [showSelectedDownloadAlert, setShowSelectedDownloadAlert] = useState(false);
+  const [showServerDeleteAlert, setShowServerDeleteAlert] = useState(false);
+  const [serverFileToDelete, setServerFileToDelete] = useState<any>(null);
 
   const local = new Local();
   const history = useHistory();
@@ -221,6 +223,7 @@ const FileList: React.FC = () => {
       
       let uploadedCount = 0;
       let failedCount = 0;
+      const uploadedFiles: string[] = [];
       
       for (const fileName of Object.keys(localFiles)) {
         try {
@@ -234,6 +237,7 @@ const FileList: React.FC = () => {
             originalModified: localFiles[fileName].modified || localFiles[fileName]
           });
           
+          uploadedFiles.push(fileName);
           uploadedCount++;
         } catch (error) {
           console.error(`Failed to upload ${fileName}:`, error);
@@ -241,9 +245,19 @@ const FileList: React.FC = () => {
         }
       }
       
+      // Delete successfully uploaded files from local storage
+      for (const fileName of uploadedFiles) {
+        try {
+          await local._deleteFile(fileName);
+        } catch (error) {
+          console.error(`Failed to delete local file ${fileName}:`, error);
+        }
+      }
+      
       if (uploadedCount > 0) {
-        setToastMsg(`Successfully uploaded ${uploadedCount} file(s) to server.${failedCount > 0 ? ` ${failedCount} file(s) failed.` : ''}`);
-        // Refresh server files if we're on the server tab
+        setToastMsg(`Successfully uploaded ${uploadedCount} file(s) to server and removed from local storage.${failedCount > 0 ? ` ${failedCount} file(s) failed.` : ''}`);
+        // Refresh both local and server files
+        loadLocalFiles();
         if (activeTab === 'server') {
           loadServerFiles();
         }
@@ -350,6 +364,7 @@ const FileList: React.FC = () => {
       
       let uploadedCount = 0;
       let failedCount = 0;
+      const uploadedFiles: string[] = [];
       
       for (const fileName of selectedLocalFiles) {
         try {
@@ -363,6 +378,7 @@ const FileList: React.FC = () => {
             originalModified: localFiles[fileName].modified || localFiles[fileName]
           });
           
+          uploadedFiles.push(fileName);
           uploadedCount++;
         } catch (error) {
           console.error(`Failed to upload ${fileName}:`, error);
@@ -370,11 +386,21 @@ const FileList: React.FC = () => {
         }
       }
       
+      // Delete successfully uploaded files from local storage
+      for (const fileName of uploadedFiles) {
+        try {
+          await local._deleteFile(fileName);
+        } catch (error) {
+          console.error(`Failed to delete local file ${fileName}:`, error);
+        }
+      }
+      
       if (uploadedCount > 0) {
-        setToastMsg(`Successfully uploaded ${uploadedCount} file(s) to server.${failedCount > 0 ? ` ${failedCount} file(s) failed.` : ''}`);
+        setToastMsg(`Successfully uploaded ${uploadedCount} file(s) to server and removed from local storage.${failedCount > 0 ? ` ${failedCount} file(s) failed.` : ''}`);
         // Clear selection
         setSelectedLocalFiles(new Set());
-        // Refresh server files if we're on the server tab
+        // Refresh both local and server files
+        loadLocalFiles();
         if (activeTab === 'server') {
           loadServerFiles();
         }
@@ -460,6 +486,41 @@ const FileList: React.FC = () => {
     } finally {
       setUploading(false);
       setShowToast(true);
+    }
+  };
+
+  // Handle server file delete
+  const handleDeleteServerFile = (file: any) => {
+    setServerFileToDelete(file);
+    setShowServerDeleteAlert(true);
+  };
+
+  const confirmDeleteServerFile = async () => {
+    if (!serverFileToDelete) return;
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.uid) {
+      setToastMsg("You must be logged in to delete server files.");
+      setShowToast(true);
+      return;
+    }
+
+    try {
+      const db = getFirestore();
+      await deleteDoc(doc(db, `users/${user.uid}/files`, serverFileToDelete.id));
+      
+      setToastMsg(`File "${serverFileToDelete.name || serverFileToDelete.id}" deleted from server successfully.`);
+      setShowToast(true);
+      
+      // Refresh server files
+      loadServerFiles();
+    } catch (error) {
+      console.error('Failed to delete server file:', error);
+      setToastMsg("Failed to delete file from server: " + error.message);
+      setShowToast(true);
+    } finally {
+      setServerFileToDelete(null);
+      setShowServerDeleteAlert(false);
     }
   };
 
@@ -718,6 +779,7 @@ const FileList: React.FC = () => {
                     {/* Download to local button */}
                     <div
                       style={{ 
+                        marginRight: 8,
                         cursor: 'pointer', 
                         padding: '10px 12px',
                         borderRadius: '8px',
@@ -745,6 +807,37 @@ const FileList: React.FC = () => {
                       }}
                     >
                       <IonIcon icon={download} size="small" />
+                    </div>
+                    {/* Delete server file button */}
+                    <div
+                      style={{ 
+                        cursor: 'pointer', 
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        backgroundColor: '#eb445a',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minWidth: '44px',
+                        minHeight: '44px',
+                        boxShadow: '0 2px 4px rgba(235, 68, 90, 0.3)',
+                        transition: 'all 0.2s ease',
+                        border: 'none'
+                      }}
+                      onClick={() => handleDeleteServerFile(file)}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#d33a4a';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(235, 68, 90, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#eb445a';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(235, 68, 90, 0.3)';
+                      }}
+                    >
+                      <IonIcon icon={trash} size="small" />
                     </div>
                   </div>
                 ))}
@@ -833,6 +926,28 @@ const FileList: React.FC = () => {
             {
               text: 'Download',
               handler: confirmDownloadSelectedFiles
+            }
+          ]}
+        />
+
+        <IonAlert
+          isOpen={showServerDeleteAlert}
+          onDidDismiss={() => setShowServerDeleteAlert(false)}
+          header="Delete Server File"
+          message={`Are you sure you want to delete "${serverFileToDelete?.name || serverFileToDelete?.id}" from the server? This action cannot be undone.`}
+          buttons={[
+            {
+              text: 'Cancel',
+              role: 'cancel',
+              handler: () => {
+                setServerFileToDelete(null);
+                setShowServerDeleteAlert(false);
+              }
+            },
+            {
+              text: 'Delete',
+              role: 'destructive',
+              handler: confirmDeleteServerFile
             }
           ]}
         />
