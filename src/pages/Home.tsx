@@ -23,7 +23,6 @@ import Menu from "../components/Menu/Menu";
 import Files from "../components/Files/Files";
 import NewFile from "../components/NewFile/NewFile";
 import { login, register } from "../components/Firebase/auth";
-import AutoSaveIndicator from "../components/AutoSave/AutoSaveIndicator";
 import { AutoSaveService } from "../components/AutoSave/AutoSaveService";
 
 const Home: React.FC = () => {
@@ -180,9 +179,6 @@ const Home: React.FC = () => {
           <IonTitle className="ion-text-center">
             Editing : {selectedFile}
           </IonTitle>
-          <div slot="end" className="ion-padding-end">
-            <AutoSaveIndicator />
-          </div>
         </IonToolbar>
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">

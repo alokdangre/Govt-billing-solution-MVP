@@ -43,7 +43,7 @@ export class AutoSaveService {
     return {
       enabled: true,
       intervalSeconds: 1, // Auto-save every 1 second by default
-      showNotifications: true
+      showNotifications: false // Silent auto-save without notifications
     };
   }
 
