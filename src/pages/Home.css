@@ -1,13 +1,311 @@
+/* Main Container Styling */
 #container {
   height: min-content;
   overflow: hidden;
+  background: var(--ion-background-color);
+  border-radius: var(--ion-border-radius-lg);
+  box-shadow: var(--ion-box-shadow);
+  margin: 16px;
+  padding: 16px;
 }
 
+/* Professional Navbar Auth Button */
 .navbar-auth-btn, .navbar-auth-btn:focus, .navbar-auth-btn:active {
-  color: #fff !important;
-  background-color: hsl(250, 83%, 53%) !important;
+  color: var(--ion-color-primary-contrast) !important;
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint)) !important;
+  border-radius: var(--ion-border-radius) !important;
+  font-weight: 600 !important;
+  padding: 8px 16px !important;
+  box-shadow: var(--ion-box-shadow-sm) !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+  text-transform: none !important;
+  letter-spacing: 0.025em !important;
+}
+
+.navbar-auth-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: var(--ion-box-shadow-md) !important;
+  background: linear-gradient(135deg, var(--ion-color-primary-shade), var(--ion-color-primary)) !important;
 }
 
 .navbar-auth-icon {
-  color: #fff !important;
+  color: var(--ion-color-primary-contrast) !important;
+  margin-right: 8px !important;
+}
+
+/* Professional Toolbar Styling */
+ion-toolbar {
+  --background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
+  --color: var(--ion-color-primary-contrast);
+  box-shadow: var(--ion-box-shadow-sm);
+}
+
+ion-toolbar ion-title {
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  font-size: 1.25rem;
+}
+
+/* Secondary Toolbar */
+ion-toolbar[color="secondary"] {
+  --background: var(--ion-color-accent);
+  --color: var(--ion-text-color);
+  border-bottom: 1px solid var(--ion-border-color);
+}
+
+/* Professional FAB Button */
+ion-fab-button {
+  --background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
+  --color: var(--ion-color-primary-contrast);
+  --box-shadow: var(--ion-box-shadow-lg);
+  --border-radius: var(--ion-border-radius-xl);
+  transition: all 0.3s ease;
+}
+
+ion-fab-button:hover {
+  --box-shadow: var(--ion-box-shadow-xl);
+  transform: scale(1.05);
+}
+
+/* Settings Icon Styling */
+.settings-icon {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--ion-border-radius);
+  transition: all 0.2s ease;
+  color: var(--ion-color-primary-contrast);
+}
+
+.settings-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
+}
+
+/* Professional Popover Styling */
+ion-popover {
+  --background: var(--ion-card-background);
+  --box-shadow: var(--ion-box-shadow-xl);
+  --border-radius: var(--ion-border-radius-lg);
+}
+
+ion-popover ion-button {
+  --background: transparent;
+  --color: var(--ion-text-color);
+  --border-radius: var(--ion-border-radius);
+  margin: 4px 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+ion-popover ion-button:hover {
+  --background: var(--ion-color-accent);
+  transform: translateX(4px);
+}
+
+/* Professional Modal Styling */
+.auth-modal {
+  --background: var(--ion-card-background);
+  --border-radius: var(--ion-border-radius-xl);
+  --box-shadow: var(--ion-box-shadow-xl);
+}
+
+.auth-modal-content {
+  padding: 32px;
+  max-width: 400px;
+  margin: 40px auto;
+  background: var(--ion-card-background);
+  border-radius: var(--ion-border-radius-xl);
+  box-shadow: var(--ion-box-shadow-xl);
+  border: 1px solid var(--ion-border-color);
+}
+
+.auth-modal h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: var(--ion-text-color);
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.025em;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-form label {
+  font-weight: 600;
+  color: var(--ion-text-color);
+  font-size: 0.875rem;
+  margin-bottom: 4px;
+  letter-spacing: 0.025em;
+}
+
+.auth-form input {
+  padding: 12px 16px;
+  border-radius: var(--ion-border-radius);
+  border: 2px solid var(--ion-border-color);
+  font-size: 16px;
+  color: var(--ion-text-color);
+  background: var(--ion-background-color);
+  transition: all 0.2s ease;
+  font-family: var(--ion-font-family);
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.auth-form input::placeholder {
+  color: var(--ion-color-medium);
+}
+
+.password-input-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--ion-color-medium);
+  font-size: 18px;
+  padding: 4px;
+  border-radius: var(--ion-border-radius-sm);
+  transition: all 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: var(--ion-color-primary);
+  background: var(--ion-color-accent);
+}
+
+.auth-error {
+  color: var(--ion-color-danger);
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  background: rgba(220, 38, 38, 0.1);
+  border-radius: var(--ion-border-radius);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.auth-success {
+  color: var(--ion-color-success);
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  background: rgba(5, 150, 105, 0.1);
+  border-radius: var(--ion-border-radius);
+  border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+/* Professional Button Styling */
+ion-button {
+  --border-radius: var(--ion-border-radius);
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: none;
+  transition: all 0.2s ease;
+}
+
+ion-button[expand="block"] {
+  margin: 8px 0;
+}
+
+ion-button:not([fill="clear"]):not([fill="outline"]) {
+  --box-shadow: var(--ion-box-shadow-sm);
+}
+
+ion-button:not([fill="clear"]):not([fill="outline"]):hover {
+  --box-shadow: var(--ion-box-shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Content Spacing */
+ion-content {
+  --background: var(--ion-background-color);
+}
+
+/* Professional Card Styling */
+.professional-card {
+  background: var(--ion-card-background);
+  border-radius: var(--ion-border-radius-lg);
+  box-shadow: var(--ion-box-shadow);
+  border: 1px solid var(--ion-border-color);
+  margin: 16px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.professional-card:hover {
+  box-shadow: var(--ion-box-shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .auth-modal-content {
+    margin: 20px;
+    padding: 24px;
+  }
+  
+  #container {
+    margin: 8px;
+    padding: 12px;
+  }
+}
+
+/* Loading States */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

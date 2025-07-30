@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonLabel, IonIcon, IonList, IonItem, IonSpinner, IonToast, IonSegment, IonSegmentButton, IonAlert, IonButton, IonSearchbar, IonCheckbox, IonGrid, IonRow, IonCol
 } from "@ionic/react";
-import { document, cloud, create, trash, cloudUpload, download, search, checkboxOutline, square } from "ionicons/icons";
+import { document, cloud, create, trash, cloudUpload, download, search, checkboxOutline, square, folderOpen } from "ionicons/icons";
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { Local } from "../components/Storage/LocalStorage";
 import * as AppGeneral from '../components/socialcalc/index.js';
 import { useHistory } from "react-router-dom";
+import "./FileList.css";
 
 const FileList: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'local' | 'server'>('local');
@@ -528,31 +529,32 @@ const FileList: React.FC = () => {
   useEffect(() => { if (activeTab === 'server') loadServerFiles(); }, [activeTab]);
 
   return (
-    <IonPage>
+    <IonPage className="file-list-page">
       <IonHeader>
-        <IonToolbar color="primary">
+        <IonToolbar color="primary" className="file-list-header">
           <IonTitle>All Files</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonSegment value={activeTab} onIonChange={e => setActiveTab(e.detail.value as 'local' | 'server')} style={{ margin: 16 }}>
+        <IonSegment value={activeTab} onIonChange={e => setActiveTab(e.detail.value as 'local' | 'server')} className="file-list-segment">
           <IonSegmentButton value="local">
             <IonIcon icon={document} />
-            <IonLabel>Local</IonLabel>
+            <IonLabel>Local Files</IonLabel>
           </IonSegmentButton>
           <IonSegmentButton value="server">
             <IonIcon icon={cloud} />
-            <IonLabel>Server</IonLabel>
+            <IonLabel>Cloud Files</IonLabel>
           </IonSegmentButton>
         </IonSegment>
 
         {/* Search Bar */}
-        <IonSearchbar
-          value={searchText}
-          onIonInput={e => setSearchText(e.detail.value!)}
-          placeholder="Search files..."
-          style={{ padding: '0 16px' }}
-        />
+        <div className="file-list-searchbar">
+          <IonSearchbar
+            value={searchText}
+            onIonInput={e => setSearchText(e.detail.value!)}
+            placeholder="Search files..."
+          />
+        </div>
         {activeTab === 'local' ? (
           loading ? <IonSpinner /> : (
             <>

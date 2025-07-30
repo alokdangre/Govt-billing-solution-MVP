@@ -1,0 +1,463 @@
+/* Professional FileList Page Styling */
+
+/* Page Layout */
+.file-list-page {
+  --background: var(--ion-background-color);
+}
+
+/* Header Styling */
+.file-list-header {
+  --background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
+  --color: var(--ion-color-primary-contrast);
+  box-shadow: var(--ion-box-shadow-sm);
+}
+
+.file-list-header ion-title {
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  font-size: 1.25rem;
+}
+
+/* Segment Styling */
+.file-list-segment {
+  margin: 16px;
+  background: var(--ion-card-background);
+  border-radius: var(--ion-border-radius-lg);
+  box-shadow: var(--ion-box-shadow);
+  border: 1px solid var(--ion-border-color);
+  overflow: hidden;
+}
+
+.file-list-segment ion-segment-button {
+  --color: var(--ion-text-color);
+  --color-checked: var(--ion-color-primary-contrast);
+  --background-checked: var(--ion-color-primary);
+  --indicator-color: var(--ion-color-primary);
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: all 0.2s ease;
+}
+
+.file-list-segment ion-segment-button:hover {
+  --background: var(--ion-color-accent);
+}
+
+/* Search Bar Styling */
+.file-list-searchbar {
+  padding: 0 16px 16px 16px;
+}
+
+.file-list-searchbar ion-searchbar {
+  --background: var(--ion-card-background);
+  --border-radius: var(--ion-border-radius-lg);
+  --box-shadow: var(--ion-box-shadow);
+  --color: var(--ion-text-color);
+  --placeholder-color: var(--ion-color-medium);
+  --icon-color: var(--ion-color-primary);
+  --clear-button-color: var(--ion-color-medium);
+  border: 1px solid var(--ion-border-color);
+}
+
+/* Action Buttons Container */
+.file-list-actions {
+  padding: 16px;
+  background: var(--ion-card-background);
+  margin: 0 16px 16px 16px;
+  border-radius: var(--ion-border-radius-lg);
+  box-shadow: var(--ion-box-shadow);
+  border: 1px solid var(--ion-border-color);
+}
+
+.file-list-actions ion-grid {
+  padding: 0;
+}
+
+.file-list-actions ion-button {
+  --border-radius: var(--ion-border-radius);
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: none;
+  --box-shadow: var(--ion-box-shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.file-list-actions ion-button:hover {
+  --box-shadow: var(--ion-box-shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Select All Checkbox */
+.file-list-select-all {
+  background: var(--ion-card-background);
+  margin: 0 16px;
+  border-radius: var(--ion-border-radius);
+  border: 1px solid var(--ion-border-color);
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 56px;
+}
+
+.file-list-select-all ion-checkbox {
+  --color: var(--ion-color-primary);
+  --color-checked: var(--ion-color-primary);
+  --checkmark-color: var(--ion-color-primary-contrast);
+  --border-radius: var(--ion-border-radius-sm);
+  --size: 20px;
+}
+
+.file-list-select-all ion-label {
+  font-weight: 600;
+  color: var(--ion-text-color);
+  margin-left: 12px;
+}
+
+/* File Items Container */
+.file-list-container {
+  margin: 16px;
+  background: var(--ion-card-background);
+  border-radius: var(--ion-border-radius-lg);
+  box-shadow: var(--ion-box-shadow);
+  border: 1px solid var(--ion-border-color);
+  overflow: hidden;
+}
+
+/* Individual File Item */
+.file-list-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--ion-border-color);
+  background: var(--ion-card-background);
+  transition: all 0.2s ease;
+  min-height: 80px;
+}
+
+.file-list-item:hover {
+  background: var(--ion-color-accent);
+  transform: translateX(2px);
+  border-left: 4px solid var(--ion-color-primary);
+  padding-left: 12px;
+}
+
+.file-list-item:last-child {
+  border-bottom: none;
+}
+
+.file-list-item:first-child {
+  border-radius: var(--ion-border-radius-lg) var(--ion-border-radius-lg) 0 0;
+}
+
+.file-list-item:last-child {
+  border-radius: 0 0 var(--ion-border-radius-lg) var(--ion-border-radius-lg);
+}
+
+.file-list-item:only-child {
+  border-radius: var(--ion-border-radius-lg);
+}
+
+/* File Item Checkbox */
+.file-item-checkbox {
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.file-item-checkbox ion-checkbox {
+  --color: var(--ion-color-primary);
+  --color-checked: var(--ion-color-primary);
+  --checkmark-color: var(--ion-color-primary-contrast);
+  --border-radius: var(--ion-border-radius-sm);
+  --size: 20px;
+}
+
+/* File Item Content */
+.file-item-content {
+  flex: 1;
+  margin-right: 16px;
+  min-width: 0;
+}
+
+.file-item-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ion-text-color);
+  margin-bottom: 4px;
+  letter-spacing: 0.025em;
+  word-break: break-word;
+}
+
+.file-item-meta {
+  font-size: 0.75rem;
+  color: var(--ion-color-medium);
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+/* File Item Actions */
+.file-item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.file-action-btn {
+  cursor: pointer;
+  padding: 12px;
+  border-radius: var(--ion-border-radius);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 1rem;
+  box-shadow: var(--ion-box-shadow-sm);
+}
+
+.file-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ion-box-shadow-md);
+}
+
+.file-action-btn:active {
+  transform: translateY(0);
+  box-shadow: var(--ion-box-shadow-sm);
+}
+
+.file-action-btn.edit {
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-tint));
+}
+
+.file-action-btn.edit:hover {
+  background: linear-gradient(135deg, var(--ion-color-primary-shade), var(--ion-color-primary));
+}
+
+.file-action-btn.download {
+  background: linear-gradient(135deg, var(--ion-color-success), var(--ion-color-success-tint));
+}
+
+.file-action-btn.download:hover {
+  background: linear-gradient(135deg, var(--ion-color-success-shade), var(--ion-color-success));
+}
+
+.file-action-btn.delete {
+  background: linear-gradient(135deg, var(--ion-color-danger), var(--ion-color-danger-tint));
+}
+
+.file-action-btn.delete:hover {
+  background: linear-gradient(135deg, var(--ion-color-danger-shade), var(--ion-color-danger));
+}
+
+/* Empty State */
+.file-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--ion-color-medium);
+  text-align: center;
+  background: var(--ion-card-background);
+  margin: 16px;
+  border-radius: var(--ion-border-radius-lg);
+  box-shadow: var(--ion-box-shadow);
+  border: 1px solid var(--ion-border-color);
+}
+
+.file-list-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+  color: var(--ion-color-medium);
+}
+
+.file-list-empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--ion-text-color);
+}
+
+.file-list-empty-subtitle {
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+  line-height: 1.5;
+}
+
+/* Loading State */
+.file-list-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--ion-color-medium);
+  background: var(--ion-card-background);
+  margin: 16px;
+  border-radius: var(--ion-border-radius-lg);
+  box-shadow: var(--ion-box-shadow);
+  border: 1px solid var(--ion-border-color);
+}
+
+.file-list-loading ion-spinner {
+  margin-right: 12px;
+  --color: var(--ion-color-primary);
+}
+
+/* Toast Styling */
+ion-toast {
+  --background: var(--ion-card-background);
+  --color: var(--ion-text-color);
+  --border-radius: var(--ion-border-radius-lg);
+  --box-shadow: var(--ion-box-shadow-xl);
+  font-weight: 500;
+}
+
+/* Alert Styling */
+ion-alert {
+  --background: var(--ion-card-background);
+  --color: var(--ion-text-color);
+  --border-radius: var(--ion-border-radius-lg);
+  --box-shadow: var(--ion-box-shadow-xl);
+}
+
+ion-alert .alert-head {
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+ion-alert .alert-message {
+  color: var(--ion-color-medium);
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .file-list-actions {
+    margin: 0 8px 16px 8px;
+    padding: 12px;
+  }
+  
+  .file-list-container {
+    margin: 8px;
+  }
+  
+  .file-list-item {
+    padding: 12px;
+    min-height: 70px;
+  }
+  
+  .file-item-name {
+    font-size: 0.9rem;
+  }
+  
+  .file-item-meta {
+    font-size: 0.7rem;
+  }
+  
+  .file-action-btn {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 10px;
+  }
+  
+  .file-item-actions {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .file-list-segment {
+    margin: 8px;
+  }
+  
+  .file-list-searchbar {
+    padding: 0 8px 12px 8px;
+  }
+  
+  .file-list-actions {
+    margin: 0 8px 12px 8px;
+  }
+  
+  .file-list-select-all {
+    margin: 0 8px;
+  }
+  
+  .file-item-content {
+    margin-right: 12px;
+  }
+  
+  .file-action-btn {
+    min-width: 36px;
+    min-height: 36px;
+    padding: 8px;
+  }
+}
+
+/* Animation Classes */
+.file-item-enter {
+  animation: fileItemEnter 0.3s ease-out;
+}
+
+@keyframes fileItemEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.file-item-exit {
+  animation: fileItemExit 0.2s ease-in;
+}
+
+@keyframes fileItemExit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+/* Focus States for Accessibility */
+.file-action-btn:focus {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}
+
+.file-list-item:focus-within {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--ion-border-radius);
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .file-list-item {
+    border: 2px solid var(--ion-text-color);
+  }
+  
+  .file-action-btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .file-list-item,
+  .file-action-btn,
+  .file-list-actions ion-button {
+    transition: none;
+  }
+  
+  .file-item-enter,
+  .file-item-exit {
+    animation: none;
+  }
+}

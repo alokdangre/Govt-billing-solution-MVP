@@ -202,9 +202,9 @@ const Home: React.FC = () => {
           <div id="msg"></div>
         </div>
       </IonContent>
-      <IonModal isOpen={showAuth} onDidDismiss={() => { setShowAuth(false); setAuthName(""); }}>
-        <div style={{ padding: 32, maxWidth: 400, margin: '40px auto', background: '#23243a', borderRadius: 16, boxShadow: '0 2px 16px rgba(0,0,0,0.15)' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: 24, color: '#fff' }}>{authMode === 'login' ? 'Login' : 'Register'}</h2>
+        <IonModal isOpen={showAuth} onDidDismiss={() => { setShowAuth(false); setAuthName(""); }} className="auth-modal">
+        <div className="auth-modal-content fade-in">
+          <h2>{authMode === 'login' ? 'Login' : 'Register'}</h2>
           <form
             onSubmit={async (e) => {
               e.preventDefault();
@@ -232,22 +232,21 @@ const Home: React.FC = () => {
                 setAuthError(err.message || 'Authentication failed');
               }
             }}
-            style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+            className="auth-form"
           >
             {authMode === 'register' && (
               <>
-                <label style={{ fontWeight: 500, color: '#fff' }}>Name</label>
+                <label>Name</label>
                 <input
                   type="text"
                   value={authName}
                   onChange={e => setAuthName(e.target.value)}
                   required
                   placeholder="Enter your name"
-                  style={{ padding: 10, borderRadius: 8, border: '1px solid #444', fontSize: 16, color: '#fff', background: '#23243a' }}
                 />
               </>
             )}
-            <label style={{ fontWeight: 500, color: '#fff' }}>Email</label>
+            <label>Email</label>
             <input
               ref={emailInputRef}
               type="email"
@@ -255,28 +254,26 @@ const Home: React.FC = () => {
               onChange={e => setAuthEmail(e.target.value)}
               required
               placeholder="Enter your email"
-              style={{ padding: 10, borderRadius: 8, border: '1px solid #444', fontSize: 16, color: '#fff', background: '#23243a' }}
             />
-            <label style={{ fontWeight: 500, color: '#fff' }}>Password</label>
-            <div style={{ position: 'relative' }}>
+            <label>Password</label>
+            <div className="password-input-container">
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={authPassword}
                 onChange={e => setAuthPassword(e.target.value)}
                 required
                 placeholder="Enter your password"
-                style={{ padding: 10, borderRadius: 8, border: '1px solid #444', fontSize: 16, color: '#fff', background: '#23243a', width: '100%' }}
               />
               <span
                 onClick={() => setShowPassword(v => !v)}
-                style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: '#fff', fontSize: 18 }}
+                className="password-toggle"
               >
                 {showPassword ? '🙈' : '👁️'}
               </span>
             </div>
-            {authError && <div style={{ color: 'red', textAlign: 'center' }}>{authError}</div>}
-            {authSuccess && <div style={{ color: 'lightgreen', textAlign: 'center' }}>{authSuccess}</div>}
-            <IonButton expand="block" type="submit" color="primary" style={{ marginTop: 12, fontWeight: 600 }}>
+            {authError && <div className="auth-error">{authError}</div>}
+            {authSuccess && <div className="auth-success">{authSuccess}</div>}
+            <IonButton expand="block" type="submit" color="primary">
               {authMode === 'login' ? 'Login' : 'Register'}
             </IonButton>
             <IonButton
@@ -289,7 +286,7 @@ const Home: React.FC = () => {
                 setAuthSuccess("");
                 setAuthName("");
               }}
-              style={{ color: '#3880ff', fontWeight: 500 }}
+              color="primary"
             >
               {authMode === 'login' ? "Don't have an account? Register" : 'Already have an account? Login'}
             </IonButton>
