@@ -1,0 +1,126 @@
+.logo-manager {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+}
+
+.logo-manager ion-button {
+  --border-radius: 8px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  min-width: 40px;
+  height: 36px;
+  margin: 0;
+  transition: all 0.2s ease;
+}
+
+.logo-manager ion-button:hover {
+  transform: scale(1.05);
+}
+
+.logo-manager ion-button[color="danger"]:hover {
+  --background: rgba(var(--ion-color-danger-rgb), 0.1);
+}
+
+.logo-manager ion-button:not([color]):hover {
+  --background: rgba(var(--ion-color-primary-rgb), 0.1);
+}
+
+.logo-manager ion-button[disabled] {
+  opacity: 0.5;
+  transform: none;
+}
+
+/* Action sheet styling */
+ion-action-sheet .action-sheet-button {
+  font-size: 1.1rem;
+  padding: 16px;
+}
+
+ion-action-sheet .action-sheet-button ion-icon {
+  margin-right: 12px;
+}
+
+/* Toast styling for logo operations */
+ion-toast.logo-toast {
+  --background: var(--ion-color-success);
+  --color: var(--ion-color-success-contrast);
+  --border-radius: 8px;
+}
+
+ion-toast.logo-toast.error {
+  --background: var(--ion-color-danger);
+  --color: var(--ion-color-danger-contrast);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .logo-manager {
+    gap: 4px;
+  }
+  
+  .logo-manager ion-button {
+    min-width: 36px;
+    height: 32px;
+    --padding-start: 6px;
+    --padding-end: 6px;
+  }
+}
+
+/* Integration with toolbar */
+.toolbar-logo-manager {
+  margin-right: 8px;
+}
+
+.toolbar-logo-manager .logo-manager ion-button {
+  --color: var(--ion-toolbar-color, var(--ion-color-contrast));
+  height: 32px;
+  min-width: 36px;
+}
+
+.toolbar-logo-manager .logo-manager ion-button:hover {
+  --background: rgba(255, 255, 255, 0.1);
+}
+
+/* Loading state */
+.logo-manager ion-button.processing {
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-manager ion-button.processing::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .logo-manager ion-button:not([color]):hover {
+    --background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .toolbar-logo-manager .logo-manager ion-button:hover {
+    --background: rgba(255, 255, 255, 0.15);
+  }
+}
