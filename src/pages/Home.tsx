@@ -24,6 +24,7 @@ import Files from "../components/Files/Files";
 import NewFile from "../components/NewFile/NewFile";
 import { login, register } from "../components/Firebase/auth";
 import { AutoSaveService } from "../components/AutoSave/AutoSaveService";
+import UndoRedo from "../components/UndoRedo/UndoRedo";
 
 const Home: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -179,6 +180,9 @@ const Home: React.FC = () => {
           <IonTitle className="ion-text-center">
             Editing : {selectedFile}
           </IonTitle>
+          <div slot="end">
+            <UndoRedo className="toolbar-undo-redo" />
+          </div>
         </IonToolbar>
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">

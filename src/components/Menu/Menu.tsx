@@ -5,7 +5,7 @@ import { isPlatform, IonToast } from "@ionic/react";
 import { EmailComposer } from "capacitor-email-composer";
 import { Printer } from "@ionic-native/printer";
 import { IonActionSheet, IonAlert } from "@ionic/react";
-import { saveOutline, save, mail, print, cloudUpload, documentText, download } from "ionicons/icons";
+import { saveOutline, save, mail, print, cloudUpload, documentText, download, arrowUndo, arrowRedo } from "ionicons/icons";
 import { APP_NAME } from "../../app-data.js";
 import jsPDF from "jspdf";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
@@ -416,6 +416,18 @@ const Menu: React.FC<{
             text: "Password Protect File",
             handler: handlePasswordProtect,
             cssClass: 'action-sheet-password',
+          },
+          {
+            text: "Undo",
+            icon: arrowUndo,
+            handler: () => { AppGeneral.undo(); },
+            cssClass: 'action-sheet-undo',
+          },
+          {
+            text: "Redo",
+            icon: arrowRedo,
+            handler: () => { AppGeneral.redo(); },
+            cssClass: 'action-sheet-redo',
           },
         ]}
       />
