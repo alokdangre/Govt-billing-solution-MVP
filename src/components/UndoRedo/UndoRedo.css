@@ -21,8 +21,14 @@
   overflow: hidden;
   --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   --background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.3), rgba(var(--ion-color-primary-rgb), 0.2));
-  --color: #000000;
+  --color: #ffffff !important;
+  color: #ffffff !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.undo-button ion-icon,
+.redo-button ion-icon {
+  color: #ffffff !important;
 }
 
 .undo-button::before,
@@ -172,7 +178,7 @@
 
 .toolbar-undo-redo .undo-button,
 .toolbar-undo-redo .redo-button {
-  --color: var(--ion-toolbar-color, var(--ion-color-contrast));
+  --color: #ffffff !important;
   height: 32px;
   min-width: 36px;
 }
@@ -180,6 +186,7 @@
 .toolbar-undo-redo .undo-button:hover:not([disabled]),
 .toolbar-undo-redo .redo-button:hover:not([disabled]) {
   --background: rgba(255, 255, 255, 0.1);
+  --color: #ffffff !important;
 }
 
 /* Animation for button state changes */

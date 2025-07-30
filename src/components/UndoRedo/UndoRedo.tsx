@@ -125,7 +125,7 @@ const UndoRedo: React.FC<UndoRedoProps> = ({ className = '', showAsFab = false }
         title="Undo (Ctrl+Z)"
         className="undo-button"
       >
-        <IonIcon icon={arrowUndo} slot="icon-only" />
+        <IonIcon icon={arrowUndo} slot="icon-only" color="dark" style={{ color: '#ffffff' }} />
       </IonButton>
       <IonButton
         size="small"
@@ -135,7 +135,7 @@ const UndoRedo: React.FC<UndoRedoProps> = ({ className = '', showAsFab = false }
         title="Redo (Ctrl+Y / Ctrl+Shift+Z)"
         className="redo-button"
       >
-        <IonIcon icon={arrowRedo} slot="icon-only" />
+        <IonIcon icon={arrowRedo} slot="icon-only" color="dark" style={{ color: '#ffffff' }} />
       </IonButton>
     </div>
   );
