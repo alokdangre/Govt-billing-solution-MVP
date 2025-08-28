@@ -5,6 +5,8 @@ import Home from "./pages/Home";
 import FileList from "./pages/FileList";
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonRouterOutlet } from "@ionic/react";
 import { home, folderOpen } from "ionicons/icons";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -55,6 +57,8 @@ const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <MainTabs />
+      <PWAInstallPrompt />
+      <PWAUpdatePrompt />
     </IonReactRouter>
   </IonApp>
 );

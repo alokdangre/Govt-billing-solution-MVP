@@ -2,11 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Ionic App</title>
+    <title>Government Billing Solution</title>
 
     <base href="/" />
 
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="A comprehensive billing solution for government services" />
+    <meta name="keywords" content="government, billing, invoice, financial, management" />
+    <meta name="author" content="Government Billing Solution" />
+    
+    <!-- Theme and Color -->
     <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#3880ff" />
+    <meta name="msapplication-TileColor" content="#3880ff" />
+    
+    <!-- Viewport and Mobile -->
     <meta
       name="viewport"
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -14,18 +24,38 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
 
+    <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
 
+    <!-- Favicons and Icons -->
     <link rel="shortcut icon" type="image/png" href="/favicon.png" />
-
-    <!-- add to homescreen for ios -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Ionic App" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
+    
+    <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />
+    
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Govt Billing" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileImage" content="/pwa-192x192.png" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Government Billing Solution" />
+    <meta property="og:description" content="A comprehensive billing solution for government services" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/pwa-512x512.png" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Government Billing Solution" />
+    <meta name="twitter:description" content="A comprehensive billing solution for government services" />
+    <meta name="twitter:image" content="/pwa-512x512.png" />
   </head>
   <body>
     <div id="root"></div>
