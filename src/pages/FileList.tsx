@@ -4,6 +4,7 @@ import {
 } from "@ionic/react";
 import { document, cloud, create, trash, cloudUpload, download, search, checkboxOutline, square } from "ionicons/icons";
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { getCurrentUser } from "../components/Firebase/auth";
 import { Local } from "../components/Storage/LocalStorage";
 import * as AppGeneral from '../components/socialcalc/index.js';
 import { useHistory } from "react-router-dom";
@@ -45,20 +46,29 @@ const FileList: React.FC = () => {
   // Load server files
   const loadServerFiles = async () => {
     setLoading(true);
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user.uid) {
-      setToastMsg("You must be logged in to view server files.");
+    try {
+      // Use Firebase auth instead of localStorage
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        setToastMsg("You must be logged in to view server files.");
+        setShowToast(true);
+        setServerFiles([]);
+        return;
+      }
+      
+      const db = getFirestore();
+      const filesCol = collection(db, `users/${currentUser.uid}/files`);
+      console.log(`users/${currentUser.uid}/files`)
+      const snap = await getDocs(filesCol);
+      const files = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setServerFiles(files);
+    } catch (error) {
+      console.error("Error loading server files:", error);
+      setToastMsg(`Failed to load server files: ${error.message}`);
       setShowToast(true);
-      setServerFiles([]);
+    } finally {
       setLoading(false);
-      return;
     }
-    const db = getFirestore();
-    const filesCol = collection(db, `users/${user.uid}/files`);
-    const snap = await getDocs(filesCol);
-    const files = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setServerFiles(files);
-    setLoading(false);
   };
 
   const editFile = async (key: string) => {
@@ -331,8 +341,8 @@ const FileList: React.FC = () => {
 
   // Upload selected files
   const handleUploadSelectedFiles = () => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user.uid) {
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
       setToastMsg("You must be logged in to upload files to server.");
       setShowToast(true);
       return;
@@ -348,8 +358,8 @@ const FileList: React.FC = () => {
   };
 
   const confirmUploadSelectedFiles = async () => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user.uid) {
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
       setToastMsg("You must be logged in to upload files.");
       setShowToast(true);
       return;
@@ -360,7 +370,7 @@ const FileList: React.FC = () => {
     
     try {
       const db = getFirestore();
-      const filesCol = collection(db, `users/${user.uid}/files`);
+      const filesCol = collection(db, `users/${currentUser.uid}/files`);
       
       let uploadedCount = 0;
       let failedCount = 0;

@@ -85,4 +85,17 @@ export default defineConfig({
       }
     }),
   ],
+  build: {
+    rollupOptions: {
+      external: (id) => {
+        // Exclude service worker files from commonjs processing
+        return id.includes('sw.js') || id.includes('workbox-') || id.includes('registerSW.js');
+      }
+    }
+  },
+  server: {
+    hmr: {
+      overlay: false
+    }
+  }
 });

@@ -9,6 +9,7 @@ import { saveOutline, save, mail, print, cloudUpload, documentText, download, ar
 import { APP_NAME } from "../../app-data.js";
 import jsPDF from "jspdf";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getCurrentUser } from "../Firebase/auth";
 import CryptoJS from "crypto-js";
 import { AutoSaveService } from "../AutoSave/AutoSaveService";
 
@@ -189,8 +190,8 @@ const Menu: React.FC<{
   const handleUploadCurrentFile = async () => {
     try {
       // Check if user is logged in
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (!user || !user.uid) {
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
         setUploadToastMsg("You must be logged in to upload to server.");
         setShowUploadToast(true);
         return;
@@ -209,7 +210,7 @@ const Menu: React.FC<{
           setPendingUploadName(fileName);
           // Now upload
           const db = getFirestore();
-          await setDoc(doc(db, `users/${user.uid}/files`, fileName.endsWith('.json') ? fileName : fileName + '.json'), {
+          await setDoc(doc(db, `users/${currentUser.uid}/files`, fileName.endsWith('.json') ? fileName : fileName + '.json'), {
             name: fileName.endsWith('.json') ? fileName : fileName + '.json',
             content: encodeURIComponent(AppGeneral.getSpreadsheetContent()),
             uploadedAt: new Date().toISOString(),
@@ -221,7 +222,7 @@ const Menu: React.FC<{
       }
       fileName = fileName.endsWith('.json') ? fileName : fileName + '.json';
       const db = getFirestore();
-      await setDoc(doc(db, `users/${user.uid}/files`, fileName), {
+      await setDoc(doc(db, `users/${currentUser.uid}/files`, fileName), {
         name: fileName,
         content: fileContent,
         uploadedAt: new Date().toISOString(),

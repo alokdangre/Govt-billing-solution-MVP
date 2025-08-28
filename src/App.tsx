@@ -7,6 +7,7 @@ import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonRouterOutlet } 
 import { home, folderOpen } from "ionicons/icons";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
+import { AuthProvider } from "./components/Auth/AuthProvider";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -54,13 +55,15 @@ const MainTabs: React.FC = () => {
 };
 
 const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <MainTabs />
-      <PWAInstallPrompt />
-      <PWAUpdatePrompt />
-    </IonReactRouter>
-  </IonApp>
+  <AuthProvider>
+    <IonApp>
+      <IonReactRouter>
+        <MainTabs />
+        <PWAInstallPrompt />
+        <PWAUpdatePrompt />
+      </IonReactRouter>
+    </IonApp>
+  </AuthProvider>
 );
 
 export default App;
