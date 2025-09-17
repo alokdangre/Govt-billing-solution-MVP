@@ -267,7 +267,38 @@ const Menu: React.FC<{
       const doc = new jsPDF({ unit: 'pt', format: 'a4' });
       // Add HTML to PDF
       await doc.html(htmlContent, { x: 20, y: 20 });
-      doc.save((props.file || 'export') + '.pdf');
+      const fileName = (props.file || 'export') + '.pdf';
+      doc.save(fileName);
+      
+      // Call webhook after successful PDF generation
+      const webhookPayload = {
+        subject: "C4GT",
+        message: "Completed",
+        event: "pdf_generated",
+        fileName: fileName,
+        timestamp: new Date().toISOString(),
+        fileSource: "govt-billing-app"
+      };
+      
+      try {
+        const webhookUrl = '/api/webhook'; // Use local proxy
+        
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(webhookPayload)
+        });
+        
+        console.log('Webhook called for PDF generation. Response status:', response.status);
+        console.log('Webhook payload sent:', webhookPayload);
+      } catch (webhookErr) {
+        console.error('Webhook call failed:', webhookErr);
+        console.log('Attempted to send webhook payload:', webhookPayload);
+        // Don't show error to user for webhook failure, as PDF generation was successful
+      }
+      
       setUploadToastMsg("PDF exported!");
       setShowUploadToast(true);
     } catch (err) {
@@ -438,7 +469,7 @@ const Menu: React.FC<{
         onDidDismiss={() => setShowAlert1(false)}
         header="Alert Message"
         message={
-          "Cannot update <strong>" + getCurrentFileName() + "</strong> file!"
+          "Cannot update " + getCurrentFileName() + " file!"
         }
         buttons={["Ok"]}
       />
@@ -448,9 +479,9 @@ const Menu: React.FC<{
         onDidDismiss={() => setShowAlert2(false)}
         header="Save"
         message={
-          "File <strong>" +
+          "File " +
           getCurrentFileName() +
-          "</strong> updated successfully"
+          " updated successfully"
         }
         buttons={["Ok"]}
       />
@@ -477,9 +508,9 @@ const Menu: React.FC<{
         onDidDismiss={() => setShowAlert4(false)}
         header="Save As"
         message={
-          "File <strong>" +
+          "File " +
           getCurrentFileName() +
-          "</strong> saved successfully"
+          " saved successfully"
         }
         buttons={["Ok"]}
       />

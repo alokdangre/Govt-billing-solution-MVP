@@ -96,6 +96,13 @@ export default defineConfig({
   server: {
     hmr: {
       overlay: false
+    },
+    proxy: {
+      '/api/webhook': {
+        target: 'https://langflow-e115.onrender.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/webhook/, '/hooks/catch/cmfnw022j0000le04h5f5vd2l/61bc4aec-97ec-42d3-bb04-1964c5673d20')
+      }
     }
   }
 });
